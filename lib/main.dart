@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 
@@ -12,12 +13,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  StreamController<double> controller = StreamController<double>.broadcast();
+  StreamController<double> controller = StreamController<double>();
   StreamSubscription<double> streamSubscription;
 
   @override
   void dispose() {
     controller?.close();
+    streamSubscription?.cancel();
     super.dispose();
   }
 
@@ -36,32 +38,71 @@ class _MyAppState extends State<MyApp> {
               MaterialButton(
                 child: Text('Subscribe'),
                 color: Colors.yellow,
-                onPressed: () {
-                  // Stream the controller manages
-                  Stream stream = controller.stream;
-                  streamSubscription = stream.listen((value) {
-                    print('Value from the controller $value');
+                // With manual random streamSubscription
+                onPressed: () async {
+                  getRandomValues().listen((value) {
+                    print('1st: $value');
                   });
                 },
+
+                // With manual random
+                // onPressed: () async {
+                //   var value1 = await getRandomValue();
+                //   var value2 = await getRandomValue();
+                // },
+
+                // With String streamSubscription
+                // onPressed: () {
+                //   // Stream the controller manages
+                //   Stream stream = controller.stream;
+                //   streamSubscription = stream.listen((value) {
+                //     print('Value from the controller $value');
+                //   });
+                // },
               ),
-              MaterialButton(
-                child: Text('Emit value'),
-                color: Colors.blue[200],
-                onPressed: () {
-                  controller.add(12);
-                },
-              ),
-              MaterialButton(
-                child: Text('Unsubscribe'),
-                color: Colors.red[200],
-                onPressed: () {
-                  streamSubscription.cancel();
-                },
-              ),
+
+              // With String streamSubscription
+              // MaterialButton(
+              //   child: Text('Emit value'),
+              //   color: Colors.blue[200],
+              //   onPressed: () {
+              //     controller.add(12);
+              //   },
+              // ),
+
+              // With String streamSubscription
+              // MaterialButton(
+              //   child: Text('Unsubscribe'),
+              //   color: Colors.red[200],
+              //   onPressed: () {
+              //     streamSubscription.cancel();
+              //   },
+              // ),
             ],
           ),
         ),
       ),
     );
   }
+
+  // With manual random streamSubscription
+  Stream<double> getRandomValues() async* {
+    var random = Random(2);
+
+    while (true) {
+      await Future.delayed(Duration(seconds: 1));
+      // yield is basically telling the
+      // function that we want return this value
+      // but we will still continue the execution
+      // of this function.
+      yield random.nextDouble();
+    }
+  }
+
+  // With manual random
+  // Future<double> getRandomValue() async {
+  //   var random = Random(2);
+  //   await Future.delayed(Duration(seconds: 1));
+  //   return random.nextDouble();
+  // }
 }
